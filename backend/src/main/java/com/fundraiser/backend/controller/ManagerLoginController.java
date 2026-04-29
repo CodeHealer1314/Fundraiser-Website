@@ -15,27 +15,29 @@ public class ManagerLoginController {
     private final AdminUserRepository adminUserRepository;
     private final JwtUtil jwtUtil;
 
-    // BCE method: login(String email, String password)
-    // Returns JWT token if valid, null if invalid
-    // Maps to sequence diagram step 4
+    /**
+     * Asks entity to check credentials
+     * Entity handles all the checking logic
+     */
     public String login(String email, String password) {
 
-        // Step 5: checkLogin(email, password)
+        // Find user by email from database
         Optional<AdminUser> userOpt = adminUserRepository.findByEmail(email);
 
-        // Step 6a: user not found → return null
+        // If user not found → return null
         if (userOpt.isEmpty()) {
             return null;
         }
 
         AdminUser user = userOpt.get();
 
-        // Step 6: validate password
-        if (!user.checkLogin(password)) {
+        // Entity checks BOTH email and password match
+        // Controller doesn't need to know HOW it checks
+        if (!user.checkCredentials(email, password)) {
             return null;
         }
 
-        // Step 7: createAccessToken(email) → Step 8: return token
+        // Generate and return JWT token
         return jwtUtil.generateToken(email);
     }
 }

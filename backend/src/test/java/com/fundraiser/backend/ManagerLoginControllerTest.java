@@ -34,49 +34,39 @@ class ManagerLoginControllerTest {
         MockitoAnnotations.openMocks(this);
         mockAdmin = new AdminUser();
         mockAdmin.setEmail("admin@test.com");
-        // Store hashed password (simulates what's in the database)
         mockAdmin.setPassword(new BCryptPasswordEncoder().encode("password123"));
     }
 
     @Test
     void login_validCredentials_returnsToken() {
-        // Arrange
         when(adminUserRepository.findByEmail("admin@test.com"))
                 .thenReturn(Optional.of(mockAdmin));
         when(jwtUtil.generateToken("admin@test.com"))
                 .thenReturn("mock.jwt.token");
 
-        // Act
         String result = managerLoginController.login("admin@test.com", "password123");
 
-        // Assert
         assertNotNull(result);
         assertEquals("mock.jwt.token", result);
     }
 
     @Test
     void login_wrongPassword_returnsNull() {
-        // Arrange
         when(adminUserRepository.findByEmail("admin@test.com"))
                 .thenReturn(Optional.of(mockAdmin));
 
-        // Act
         String result = managerLoginController.login("admin@test.com", "wrongpassword");
 
-        // Assert
         assertNull(result);
     }
 
     @Test
     void login_userNotFound_returnsNull() {
-        // Arrange
         when(adminUserRepository.findByEmail("unknown@test.com"))
                 .thenReturn(Optional.empty());
 
-        // Act
         String result = managerLoginController.login("unknown@test.com", "password123");
 
-        // Assert
         assertNull(result);
     }
 }

@@ -19,9 +19,14 @@ public class AdminUser {
     @Column(nullable = false)
     private String password;
 
-    // BCE method: checkLogin(String email, String password)
-    public boolean checkLogin(String rawPassword) {
+    /**
+     * Entity handles ALL credential checking
+     * Returns true if BOTH email exists AND password matches
+     */
+    public boolean checkCredentials(String inputEmail, String inputPassword) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.matches(rawPassword, this.password);
+        // Check email matches AND password matches
+        return this.email.equals(inputEmail) &&
+                encoder.matches(inputPassword, this.password);
     }
 }
