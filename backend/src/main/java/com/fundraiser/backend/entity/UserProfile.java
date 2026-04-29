@@ -24,6 +24,8 @@ public class UserProfile {
 
     private String role;
 
+    private boolean suspended = false;
+
     // Empty implementation - will implement in Step 4
     public static UserProfile saveProfile(
             Object data,
