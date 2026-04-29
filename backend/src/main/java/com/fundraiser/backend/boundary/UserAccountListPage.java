@@ -1,5 +1,6 @@
 package com.fundraiser.backend.boundary;
 
+import com.fundraiser.backend.controller.SuspendUserAccountController;
 import com.fundraiser.backend.controller.ViewUserAccountController;
 import com.fundraiser.backend.entity.UserAccount;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +17,31 @@ import java.util.Map;
 public class UserAccountListPage {
 
     private final ViewUserAccountController viewUserAccountController;
+    private final SuspendUserAccountController suspendUserAccountController;
 
-    // Empty implementation - will implement in Step 4
     @GetMapping("/accounts")
     public ResponseEntity<?> loadAccounts() {
         List<UserAccount> accounts = viewUserAccountController.loadAccounts();
 
-        // Step 6a: no accounts found
         if (accounts.isEmpty()) {
             return ResponseEntity.ok(Map.of("message", "No user accounts found"));
         }
 
-        // Step 6: renderAccountList(results)
         return ResponseEntity.ok(accounts);
+    }
+
+    @PatchMapping("/accounts/{accountId}/suspend")
+    public ResponseEntity<?> suspendAccount(@PathVariable String accountId) {
+        // Step 4: handleSuspend(accountId)
+        boolean result = suspendUserAccountController.handleSuspend(accountId);
+
+        if (!result) {
+            return ResponseEntity
+                    .status(400)
+                    .body(Map.of("message", "Suspension failed - account not found or already suspended"));
+        }
+
+        // Step 8: setSuccessMessage("Account suspended successfully")
+        return ResponseEntity.ok(Map.of("message", "Account suspended successfully"));
     }
 }
