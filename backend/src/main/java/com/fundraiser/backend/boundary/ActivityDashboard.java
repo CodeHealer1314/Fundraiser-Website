@@ -1,5 +1,6 @@
 package com.fundraiser.backend.boundary;
 
+import com.fundraiser.backend.controller.SearchActivityController;
 import com.fundraiser.backend.controller.ViewActivityController;
 import com.fundraiser.backend.entity.FundRaisingActivity;
 import lombok.RequiredArgsConstructor;
@@ -16,20 +17,37 @@ import java.util.Map;
 public class ActivityDashboard {
 
     private final ViewActivityController viewActivityController;
+    private final SearchActivityController searchActivityController;
 
-    // Step 1: Open activity dashboard
+    // UC#16: loadActivities
     @GetMapping("/activities/{fundRaiserId}")
     public ResponseEntity<?> loadActivities(@PathVariable String fundRaiserId) {
 
-        // Step 2: loadActivities(fund_raiser_id)
         List<FundRaisingActivity> activities = viewActivityController.loadActivities(fundRaiserId);
 
         if (activities.isEmpty()) {
-            // Step 6a: renderNoResult("No activities found")
             return ResponseEntity.ok(Map.of("message", "No activities found"));
         }
 
-        // Step 6: renderActivityList(results)
         return ResponseEntity.ok(activities);
+    }
+
+    // UC#19: searchActivities
+    @GetMapping("/activities/{fundRaiserId}/search")
+    public ResponseEntity<?> handleSearch(
+            @PathVariable String fundRaiserId,
+            @RequestParam String keyword) {
+
+        // Step 3: searchActivities(keyword)
+        List<FundRaisingActivity> results = searchActivityController
+                .searchActivities(fundRaiserId, keyword);
+
+        if (results.isEmpty()) {
+            // Step 7a: renderNoResult("No activities found")
+            return ResponseEntity.ok(Map.of("message", "No activities found"));
+        }
+
+        // Step 7: renderActivityList(results)
+        return ResponseEntity.ok(results);
     }
 }
