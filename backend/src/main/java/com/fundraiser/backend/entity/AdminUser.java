@@ -1,8 +1,11 @@
 package com.fundraiser.backend.entity;
 
+import com.fundraiser.backend.repository.AdminUserRepository;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Optional;
 
 @Data
 @Entity
@@ -19,14 +22,28 @@ public class AdminUser {
     @Column(nullable = false)
     private String password;
 
-    /**
-     * Entity handles ALL credential checking
-     * Returns true if BOTH email exists AND password matches
-     */
-    public boolean checkCredentials(String inputEmail, String inputPassword) {
+    public static AdminUser checkLogin(
+            String inputEmail,
+            String inputPassword,
+            AdminUserRepository repository) {
+
+        // Find user by email from database
+        Optional<AdminUser> userOpt = repository.findByEmail(inputEmail);
+
+        // If user not found → return null
+        if (userOpt.isEmpty()) {
+            return null;
+        }
+
+        AdminUser user = userOpt.get();
+
+        // Check password matches
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        // Check email matches AND password matches
-        return this.email.equals(inputEmail) &&
-                encoder.matches(inputPassword, this.password);
+        if (!encoder.matches(inputPassword, user.password)) {
+            return null;
+        }
+
+        // Both checks passed → return the user
+        return user;
     }
 }
