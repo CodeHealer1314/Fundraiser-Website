@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+defaults:
+  run:
+    working-directory: ./backend
+
 jobs:
   build-and-test:
     name: Build, Test, and Package
@@ -21,6 +25,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Make mvnw executable
+        run: chmod +x mvnw
 
       - name: Run tests
         run: ./mvnw -B test
@@ -32,5 +40,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fundraiser-backend-jar
-          path: target/*.jar
+          path: backend/target/*.jar
           retention-days: 30
