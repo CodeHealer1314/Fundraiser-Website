@@ -47,7 +47,7 @@ class ManagerLoginControllerTest {
         String result = managerLoginController.login("admin@test.com", "password123");
 
         assertNotNull(result);
-        assertEquals("mock.jwt.token", result);
+        assertEquals("wrong.token", result);
     }
 
     @Test
