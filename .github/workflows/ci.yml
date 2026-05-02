@@ -28,7 +28,7 @@ jobs:
           cache-dependency-path: backend/pom.xml
 
       - name: Make mvnw executable
-        run: chmod +x backend/mvnw
+        run: chmod +x mvnw
 
       - name: Run tests
         run: ./mvnw -B test
