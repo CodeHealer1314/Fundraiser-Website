@@ -1,6 +1,7 @@
 package com.fundraiser.backend.boundary;
 
 import com.fundraiser.backend.controller.DoneeViewActivityController;
+import com.fundraiser.backend.controller.SaveFavouriteController;
 import com.fundraiser.backend.entity.FundRaisingActivity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class DoneeActivityDetailPage {
 
     private final DoneeViewActivityController doneeViewActivityController;
+    private final SaveFavouriteController saveFavouriteController;
 
     // GET /api/donee/activities/{activityId}
     // BCE boundary entry point — maps to sequence diagram step 1 "clickActivity"
@@ -34,5 +36,27 @@ public class DoneeActivityDetailPage {
 
         // Step 6: renderActivityDetails(details)
         return ResponseEntity.ok(activity);
+    }
+
+    // POST /api/donee/{doneeId}/activities/{activityId}/save
+    // BCE boundary entry point — maps to sequence diagram step 1 "Click Save"
+    @PostMapping("/{doneeId}/activities/{activityId}/save")
+    public ResponseEntity<?> clickSave(
+            @PathVariable String doneeId,
+            @PathVariable String activityId) {
+
+        // Step 2: handleSaveFavourite(donee_id, activity_id)
+        boolean success = saveFavouriteController
+                .handleSaveFavourite(doneeId, activityId);
+
+        if (!success) {
+            // Step 6a: showErrorMessage("Unable to save activity")
+            return ResponseEntity
+                    .status(400)
+                    .body(Map.of("message", "Unable to save activity"));
+        }
+
+        // Step 6: setSuccessMessage("Activity saved successfully")
+        return ResponseEntity.ok(Map.of("message", "Activity saved successfully"));
     }
 }
